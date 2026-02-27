@@ -1,17 +1,17 @@
 #version 120
 uniform mat4 osg_ViewMatrixInverse;
 uniform vec3 lightPos;
-uniform sampler2DRect posMap;
-uniform sampler2DRect normalMap;
-uniform sampler2DRect colorMap;
-uniform sampler2DRect shadowMap;
+uniform sampler2D posMap;
+uniform sampler2D normalMap;
+uniform sampler2D colorMap;
+uniform sampler2D shadowMap;
 
 void main()
 {
-    vec3 p_worldspace = texture2DRect(posMap,    gl_FragCoord.xy).xyz;
-    vec3 n_worldspace = texture2DRect(normalMap, gl_FragCoord.xy).xyz;
-    vec3 c_worldspace = texture2DRect(colorMap,  gl_FragCoord.xy).xyz;
-    vec3 s_worldspace = texture2DRect(shadowMap, gl_FragCoord.xy).xyz;
+    vec3 p_worldspace = texture2D(posMap,    gl_TexCoord[0].xy).xyz;
+    vec3 n_worldspace = texture2D(normalMap, gl_TexCoord[0].xy).xyz;
+    vec3 c_worldspace = texture2D(colorMap,  gl_TexCoord[0].xy).xyz;
+    vec3 s_worldspace = texture2D(shadowMap, gl_TexCoord[0].xy).xyz;
     // Direction from point to light (not vice versa!)
     vec3 lightDir_worldspace = normalize(lightPos - p_worldspace);
     // Lambertian diffuse color.
