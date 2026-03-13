@@ -4,7 +4,9 @@ varying vec3 v_normal;
 varying vec3 cameraPos;
 varying vec3 fragPos;
 
-uniform mat4 osg_ViewMatrixInverse;
+
+// 根据高度图计算法线
+vec3 getNormal(vec2 p);
 
 
 void main() {
@@ -15,14 +17,17 @@ void main() {
     // shading
     vec3 lightDir = normalize(vec3(1.0,1.0,1.0));
 
-    float diff=max(dot(v_normal,lightDir),0.0);
+    vec3 normal = getNormal(v_uv);
+    // vec3 normal = v_normal;
+
+    float diff=max(dot(normal,lightDir),0.0);
 
     vec3 deep=vec3(0.0,0.15,0.35);
     vec3 shallow=vec3(0.0,0.55,0.85);
     color = mix(deep,shallow,diff);
 
     vec3 viewDir = normalize(cameraPos-fragPos);
-    vec3 reflectDir = reflect(-lightDir,v_normal);
+    vec3 reflectDir = reflect(-lightDir,normal);
     float spec = pow(max(dot(viewDir,reflectDir),0.0),16);
 
     // color += spec*vec3(1.0);
