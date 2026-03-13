@@ -1,7 +1,13 @@
 #version 120
 varying vec2 v_uv;
 varying vec3 v_normal;
+
+varying vec3 cameraPos;
+varying vec3 fragPos;
+
 uniform float iTime;
+uniform mat4 osg_ViewMatrixInverse;
+
 
 const float PI = 3.14159265359;
 
@@ -54,26 +60,28 @@ float SprayWave(vec2 uv)
  
     // decl = step(r, 0.2);
     
-    float noiseheight = hashNoise(uv*100.0);
+    float noiseheight = hashNoise(uv*467.88);
     float noisehash = hash(uv);
 
     float height = decl * (0.6 * radial + 0.4 * noise * distort);
 
     height = decl * (0.6 * radial + 0.4 * noise);
 
+
     // height = decl * radial;
 
     // height = decl * noise;
 
-    height += noiseheight;
-
-    height *= amp;
-
-    if(height<0.1)
+    height += noiseheight; //0-2
+    height *= amp;// 0-0.2
+    height -= amp; //[-0.1,0.1]
+    if(height<0.0)
         height = 0.0;
-    // height = noisehash;
 
-    height/=2.0;
+    // height/=2.0;
+
+    // height = noiseheight*amp;
+    // height = noisehash;
 
     return height;
 }
@@ -150,6 +158,7 @@ float oceanHeight(vec2 uv)
     float height = 0.0;
     height += SprayWave(uv);
     height += vortexRing(uv);
+    height*=1.0;// 整体缩放系数，控制波浪高度
     return height;
 }
 
@@ -165,7 +174,6 @@ vec3 getNormal(vec2 p)
     return normalize(vec3(h-hx,e,h-hy));
 }
 
-
 void main()
 {
     // Vertex position in main camera Screen space.
@@ -176,6 +184,11 @@ void main()
     vertexPos.z = oceanHeight(v_uv);
     v_normal = getNormal(v_uv);
     // vertexPos.z = sin(v_uv.x * 20.0 - iTime * 5.0)*0.1;
+
+    cameraPos = osg_ViewMatrixInverse[3].xyz;
+
+    mat4 modelMatrix = osg_ViewMatrixInverse * gl_ModelViewMatrix;
+    fragPos = (modelMatrix * vec4(vertexPos,1.0)).xyz;
 
     gl_Position = gl_ModelViewProjectionMatrix * vec4(vertexPos, 1.0);
 }
