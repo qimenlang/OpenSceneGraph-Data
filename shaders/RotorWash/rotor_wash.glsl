@@ -42,7 +42,7 @@ float SprayWave(vec2 uv)
     float nosieRotateSpeed = 0.0;
 
     // --- 半径扰动 ---
-    r = r + 0.027 * angleNoise;
+    r = r + 0.01 * angleNoise;
 
 
     float noise =
@@ -66,12 +66,12 @@ float SprayWave(vec2 uv)
  
     // decl = step(r, 0.2);
     
-    float noiseheight = hashNoise(uv*100);
+    float noiseheight = hashNoise(uv*100+vec2(iTime,0.0));
     float noisehash = hash(uv);
 
     float height = (0.6 * radial + 0.4 * noise * distort);
-    // height = abs(0.6 * radial + 0.4 * noise);
-    height = (0.6 * radial + 0.4 * noise);
+    height = abs(0.6 * radial + 0.4 * noise);
+    // height = (0.6 * radial + 0.4 * noise);
 
 
 
@@ -79,14 +79,15 @@ float SprayWave(vec2 uv)
 
     // height = decl * noise;
 
-    // height += noiseheight; //0-2
-    // height *= noiseheight;
     height *= amp;// 0-0.2
     // height -= amp; //[-0.1,0.1]
-    // if(noiseheight<0.5)
-    //     height = 0.0;
+    
+    if(height<0)
+        height = 0.0;
 
+    height += noiseheight*0.03; //0-2
     height*=decl;
+    // height *= noiseheight;
     // height/=2.0;
 
     // height = noiseheight*amp;
@@ -153,7 +154,7 @@ float vortexRing(vec2 uv){
     // 振幅、波长、速度
     float amp = 0.1; // 波纹振幅 米
     float len = 0.04;
-    float speed = 0.05;
+    float speed = 0.1;
     vec2 uv0 = uv-vec2(0.0,0.0);
     float declRatio = 10.0; // 衰减速率
 

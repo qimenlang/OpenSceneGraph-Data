@@ -20,7 +20,7 @@ void main()
 
     vec3 vertexPos = gl_Vertex.xyz;
 
-    // vertexPos.z = oceanHeight(v_uv);
+    vertexPos.z = oceanHeight(v_uv);
     v_normal = getNormal(v_uv);
     // vertexPos.z = sin(v_uv.x * 20.0 - iTime * 5.0)*0.1;
 
