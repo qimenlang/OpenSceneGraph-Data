@@ -1,4 +1,7 @@
 #version 120
+
+uniform sampler2D rippleTex;
+
 varying vec2 v_uv;
 varying vec3 v_normal;
 varying vec3 cameraPos;
@@ -34,6 +37,8 @@ void main() {
 
     // 真是水体模型：
     // color = mix(refraction, reflection, fresnel)
+
+    // color = shallow;
 
     gl_FragColor = vec4(color, 1.0);
 }

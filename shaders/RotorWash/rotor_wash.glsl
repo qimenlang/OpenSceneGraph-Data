@@ -1,3 +1,5 @@
+uniform sampler2D rippleTex;
+
 const float PI = 3.14159265359;
 uniform float iTime;
 float hash(vec2 p)
@@ -24,7 +26,12 @@ float hashNoise(vec2 p)
 
 float SprayWave(vec2 uv)
 {
+    // 挪动中心点,尽量模拟多个涡流中心
+    // vec2 center = vec2(sin(iTime*0.7),cos(iTime*0.5))*0.02;
+    // uv = uv - center;
+
     float amp = 0.1; // 波纹振幅 米
+    // 极坐标
     float r = length(uv);
     float a = atan(uv.y, uv.x);
 
@@ -38,18 +45,18 @@ float SprayWave(vec2 uv)
     float radialSpeed = 8.88;
     float radialFreq = 60.0;
 
-    float nosieFreq = 3.0;
+    float nosieFreq = 5.0;
     float nosieRotateSpeed = 0.0;
 
     // --- 半径扰动 ---
     r = r + 0.01 * angleNoise;
 
-
+    // 按角度生成放射状条纹
     float noise =
         sin(a * 24.0 *nosieFreq+ t * 2.0*nosieRotateSpeed) *
         sin(a * 13.0 *nosieFreq - t * 1.5*nosieRotateSpeed);
 
-    // 径向
+    // 径向传播
     float radial =
         sin(r * radialFreq - t * radialSpeed);
     
@@ -66,32 +73,36 @@ float SprayWave(vec2 uv)
  
     // decl = step(r, 0.2);
     
-    float noiseheight = hashNoise(uv*100+vec2(iTime,0.0));
+    float noiseheight = hashNoise(uv*500+vec2(31.0,42.0)*iTime);
     float noisehash = hash(uv);
 
     float height = (0.6 * radial + 0.4 * noise * distort);
     height = abs(0.6 * radial + 0.4 * noise);
     // height = (0.6 * radial + 0.4 * noise);
 
-
-
-    // height = decl * radial;
-
-    // height = decl * noise;
-
-    height *= amp;// 0-0.2
     // height -= amp; //[-0.1,0.1]
     
-    if(height<0)
+    // 增加噪声
+    // height -= noiseheight*0.02;
+    // height -= 0.5;
+    // height *= noiseheight;
+    height = noise * radial;
+    if(height < 0.0)
         height = 0.0;
 
-    height += noiseheight*0.03; //0-2
-    height*=decl;
-    // height *= noiseheight;
+    // height += noiseheight*0.03; //0-2
     // height/=2.0;
 
-    // height = noiseheight*amp;
+    // height = noiseheight;
     // height = noisehash;
+
+    // height = radial;
+    // height = noise;
+    // height = noise*radial;
+
+    height *= decl;
+    height *= amp;// 0-0.1
+
 
     return height;
 }
@@ -167,16 +178,35 @@ float vortexRing(vec2 uv){
     return ring;
 }
 
+
+float RotorRipple(vec2 p)
+{
+    float r = length(p);
+    float a = atan(p.y, p.x);
+
+    // 映射角度到 0..1
+    float angle = (a + 3.1415926) / (2.0 * 3.1415926);
+
+    // 波向外传播
+    float u = r * 0.6 - iTime * 0.8;
+
+    vec2 uv = vec2(u, angle);
+
+    float height = texture2D(rippleTex, uv).r;
+
+    return height;
+}
+
 float oceanHeight(vec2 uv)
 {
     uv -= 0.5; // 以(0.5,0.5)为中心产生波纹
     float height = 0.0;
     height += SprayWave(uv);
-    height += vortexRing(uv);
+    // height += vortexRing(uv);
+    // height += RotorRipple(uv);
     height*=0.3;// 整体缩放系数，控制波浪高度
     return height;
 }
-
 // 根据高度图计算法线,前向差分
 vec3 getNormalPre(vec2 p)
 {

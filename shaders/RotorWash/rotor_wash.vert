@@ -1,4 +1,6 @@
 #version 120
+uniform sampler2D rippleTex;
+
 varying vec2 v_uv;
 varying vec3 v_normal;
 
@@ -12,6 +14,7 @@ float oceanHeight(vec2 uv);
 // 根据高度图计算法线
 vec3 getNormal(vec2 p);
 
+float RotorRipple(vec2 p);
 
 void main()
 {
@@ -21,6 +24,9 @@ void main()
     vec3 vertexPos = gl_Vertex.xyz;
 
     vertexPos.z = oceanHeight(v_uv);
+
+    // vertexPos.z = RotorRipple(v_uv);
+
     v_normal = getNormal(v_uv);
     // vertexPos.z = sin(v_uv.x * 20.0 - iTime * 5.0)*0.1;
 
