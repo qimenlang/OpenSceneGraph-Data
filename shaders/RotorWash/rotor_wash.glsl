@@ -42,7 +42,7 @@ float SprayWave(vec2 uv)
         sin(a*7.0 + r*8.0 + t*1.7)
         *sin(a*13.0 - r*5.0 - t*1.3);
 
-    float radialSpeed = 8.88;
+    float radialSpeed = 0.888;
     float radialFreq = 60.0;
 
     float nosieFreq = 5.0;
@@ -204,7 +204,7 @@ float oceanHeight(vec2 uv)
     height += SprayWave(uv);
     // height += vortexRing(uv);
     // height += RotorRipple(uv);
-    height*=0.3;// 整体缩放系数，控制波浪高度
+    // height*=0.3;// 整体缩放系数，控制波浪高度
     return height;
 }
 // 根据高度图计算法线,前向差分
@@ -216,7 +216,7 @@ vec3 getNormalPre(vec2 p)
     float hx=oceanHeight(p+vec2(e,0));
     float hy=oceanHeight(p+vec2(0,e));
 
-    return normalize(vec3(h-hx,e,h-hy));
+    return normalize(vec3(h-hx,h-hy,e));
 }
 
 // 中心差分
@@ -228,8 +228,8 @@ vec3 getNormalMid(vec2 p) {
     float hD = oceanHeight(p - vec2(0.0, e));
     float hU = oceanHeight(p + vec2(0.0, e));
 
-    // 直接构建法线向量（等价于中心差分）
-    return normalize(vec3(hL - hR, 2.0 * e, hD - hU));
+    // 直接构建法线向量（等价于中心差分），注意osg是z up
+    return normalize(vec3(hL - hR,  hD - hU,2.0 * e));
 }
 
 vec3 getNormal(vec2 p){

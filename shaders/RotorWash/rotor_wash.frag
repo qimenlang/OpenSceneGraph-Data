@@ -20,6 +20,9 @@ void main() {
     // shading
     vec3 lightDir = normalize(vec3(1.0,1.0,1.0));
 
+    lightDir = normalize(vec3(0.0,0.0,1.0));
+
+    // [-1,1]范围的法线，还没转到世界空间
     vec3 normal = getNormal(v_uv);
     // vec3 normal = v_normal;
     // color = normalize(v_normal);
@@ -29,6 +32,8 @@ void main() {
     vec3 deep=vec3(0.0,0.15,0.35);
     vec3 shallow=vec3(0.0,0.55,0.85);
     color = mix(deep,shallow,diff);
+
+    // color = vec3(diff);
     // color = shallow*diff;
 
     vec3 viewDir = normalize(cameraPos-fragPos);
@@ -39,6 +44,11 @@ void main() {
     // color = mix(refraction, reflection, fresnel)
 
     // color = shallow;
+    
+    // 法线可视化
+    // color = normal*0.5+0.5;
+    // color = normal;
+    // color = vec3(v_uv,0);
 
     gl_FragColor = vec4(color, 1.0);
 }
