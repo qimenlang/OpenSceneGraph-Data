@@ -24,6 +24,7 @@ float hashNoise(vec2 p)
     return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
 }
 
+// 基于极坐标下角度的放射波
 float SprayWave(vec2 uv)
 {
     // 挪动中心点,尽量模拟多个涡流中心
@@ -62,7 +63,7 @@ float SprayWave(vec2 uv)
     
     // 畸变,带了旋转
     float distort =
-        sin(a * 12.0 + r * 20.0 + t * 3.0);
+        sin(a * 120.0 + r * 20.0 + t * 3.0);
 
     // 随距离衰减,0.1处最强；0.0-0.2范围内衰减
     float highpoint = 0.2;
@@ -99,12 +100,48 @@ float SprayWave(vec2 uv)
     // height = radial;
     // height = noise;
     // height = noise*radial;
+    height = distort;
 
-    height *= decl;
-    height *= amp;// 0-0.1
+    // height *= decl;
+    // height *= amp;// 0-0.1
 
 
     return height;
+}
+
+//基于方向场的放射波
+float SparyWave2(vec2 uv){
+    float r = length(uv);
+    //方向场
+    vec2 dir = normalize(uv);
+
+    vec2 tangent1 = vec2(-dir.y, dir.x);  // 逆时针 90°
+    vec2 tangent2 = vec2(dir.y, -dir.x);  // 顺时针 90°
+
+    // 在切线方向扭曲
+    dir += tangent1*1.0*r;
+    dir = normalize(dir);
+
+    float angle = atan(dir.y, dir.x);
+
+    // 分段数
+    float N = 256;   // 比如 8、16、32
+
+    float step = 2.0 * PI / N;
+
+    // 量化角度
+    angle = floor(angle / step) ;
+
+    // 转回方向
+    dir = vec2(cos(angle), sin(angle));
+
+    // 用作偏移
+    float hashHight =hashNoise(dir);
+
+    float sinHeight = sin(100*r);
+
+    float sparyHeight = sin(100*r+100*hashHight-10*iTime)*0.03;
+    return sparyHeight;
 }
 
 float hash2(float x)
@@ -201,7 +238,8 @@ float oceanHeight(vec2 uv)
 {
     uv -= 0.5; // 以(0.5,0.5)为中心产生波纹
     float height = 0.0;
-    height += SprayWave(uv);
+    // height += SprayWave(uv);
+    height += SparyWave2(uv);
     // height += vortexRing(uv);
     // height += RotorRipple(uv);
     // height*=0.3;// 整体缩放系数，控制波浪高度

@@ -1,15 +1,19 @@
 #version 120
 
 uniform sampler2D rippleTex;
+uniform float iTime;
 
 varying vec2 v_uv;
 varying vec3 v_normal;
 varying vec3 cameraPos;
 varying vec3 fragPos;
 
+const float PI = 3.14159265359;
+
 
 // 根据高度图计算法线
 vec3 getNormal(vec2 p);
+float hashNoise(vec2 p);
 
 
 void main() {

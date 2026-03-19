@@ -23,7 +23,7 @@ void main()
 
     vec3 vertexPos = gl_Vertex.xyz;
 
-    vertexPos.z = oceanHeight(v_uv);
+    // vertexPos.z = oceanHeight(v_uv);
 
     // vertexPos.z = RotorRipple(v_uv);
 
