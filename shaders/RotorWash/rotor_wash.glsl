@@ -1,5 +1,12 @@
 uniform sampler2D rippleTex;
 
+struct VortexPara {
+    float amp; 
+    float len;
+    float speed;
+}; 
+uniform VortexPara vortexPara;
+
 const float PI = 3.14159265359;
 uniform float iTime;
 float hash(vec2 p)
@@ -188,7 +195,6 @@ float gerstnerIrregular(vec2 uv, vec2 dir, float amp, float len, float speed,flo
     return amp*sin(phase);
 }
 
-
 float vortexRing(vec2 uv){
 
     float r = length(uv); 
@@ -200,9 +206,9 @@ float vortexRing(vec2 uv){
 
     // 2. 叠加多个偏移的波纹，模拟旋翼下的复杂涡流
     // 振幅、波长、速度
-    float amp = 0.1; // 波纹振幅 米
-    float len = 0.04;
-    float speed = 0.1;
+    // float amp = 0.1; // 波纹振幅 米
+    // float len = 0.04;
+    // float speed = 0.1;
     vec2 uv0 = uv-vec2(0.0,0.0);
     float declRatio = 10.0; // 衰减速率
 
@@ -210,7 +216,7 @@ float vortexRing(vec2 uv){
     // vec2 warp = vec2(noise(uv*3.0 + iTime),noise(uv*3.0 + iTime + 10.0));
     // uv0 += warp * 0.03;
     // ring =  gerstner(uv0, normalize(uv0), amp, len, speed*0.8);
-    ring =  gerstnerIrregular(uv0, normalize(uv0), amp, len, speed*0.8,declRatio);
+    ring =  gerstnerIrregular(uv0, normalize(uv0), vortexPara.amp, vortexPara.len, vortexPara.speed,declRatio);
     
     return ring;
 }
@@ -239,8 +245,8 @@ float oceanHeight(vec2 uv)
     uv -= 0.5; // 以(0.5,0.5)为中心产生波纹
     float height = 0.0;
     // height += SprayWave(uv);
-    height += SparyWave2(uv);
-    // height += vortexRing(uv);
+    // height += SparyWave2(uv);
+    height += vortexRing(uv);
     // height += RotorRipple(uv);
     // height*=0.3;// 整体缩放系数，控制波浪高度
     return height;
